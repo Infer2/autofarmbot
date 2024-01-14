@@ -1,130 +1,53 @@
-const { Client } = require('discord.js-selfbot-v13');
-const keypress = require('keypress');
-const fs = require('fs');
-
-// Load configuration from config.json
-const config = JSON.parse(fs.readFileSync('config.json', 'utf-8'));
-
-const client = new Client({
-  checkUpdate: false,
-});
-
-const targetChannelId = config.targetChannelId;
-let totalButtonClicks = 0;
-let shouldClickButton = true;
-let pauseButtonClick = false;
-
-client.on('ready', async () => {
-  // Set an initial interval
-  clickButtonRandomly();
-});
-
-client.login(config.token);
+const {
+	Client: Client
+} = require("discord.js-selfbot-v13"), keypress = require("keypress"), fs = require("fs"), config = JSON.parse(fs.readFileSync("config.json", "utf-8")), client = new Client({
+	checkUpdate: !1
+}), targetChannelId = config.targetChannelId;
+let totalButtonClicks = 0,
+	shouldClickButton = !0,
+	shouldClickButtonAbove = !1,
+	pauseButtonClick = !1;
 
 function clickButtonRandomly() {
-  try {
-    // Call the function to click the button if shouldClickButton is true
-    if (shouldClickButton && !pauseButtonClick) {
-      clickButtonInChannel();
-    }
-
-    const cooldown = config.cooldown;
-
-    // Calculate the modified minimum and maximum range
-    const minRange = cooldown * 1000 + 0.186;
-    const maxRange = cooldown * 1000 + 0.329;
-
-    // Generate a random delay within the modified range (in milliseconds)
-    const randomDelay = Math.floor(Math.random() * (maxRange - minRange + 1)) + minRange;
-
-    // Set the next timeout with the random delay
-    setTimeout(clickButtonRandomly, randomDelay);
-  } catch (error) {
-    console.error('Error:', error);
-  }
+	try {
+		shouldClickButton && !pauseButtonClick && clickButtonInChannel();
+		const t = config.cooldown,
+			e = 1e3 * t + .221,
+			o = 1e3 * t + .331,
+			n = Math.floor(Math.random() * (o - e + 1)) + e;
+		setTimeout(clickButtonRandomly, n)
+	} catch (t) {
+		console.error("Error:", t)
+	}
 }
-
 async function clickButtonInChannel() {
-  try {
-    // Get the target channel
-    const targetChannel = await client.channels.fetch(targetChannelId);
-
-    if (targetChannel.isText()) {
-      // Fetch the last two messages in the channel
-      const messages = await targetChannel.messages.fetch({ limit: 2 });
-      const lastMessage = messages.last(); // last() gets the latest message
-      const messageAbove = messages.first(); // first() gets the message above the latest one
-
-      // Check if the message above has components (buttons) and an embed
-      if (messageAbove.components.length > 0 && messageAbove.embeds.length > 0) {
-        const embedTitle = messageAbove.embeds[0].title;
-
-        // Check if the embed title is not null and contains "Antibot Verification"
-        if (embedTitle && embedTitle.includes('Antibot Verification')) {
-          // Set shouldClickButton to false to stop further clicks
-          shouldClickButton = false;
-
-          // Extract 6 letters from the embed description after "playing:"
-          const embedDescription = messageAbove.embeds[0].description;
-          const playingTextIndex = embedDescription.indexOf('playing:') + 'playing:'.length;
-          const sixLetters = embedDescription.substr(playingTextIndex).match(/[A-Za-z0-9]{6}/)?.[0];
-
-          // Send the slash command or fallback to regular send
-          if (sixLetters) {
-            if (targetChannel.sendSlash) {
-              await targetChannel.sendSlash('631216892606152714', 'verify', sixLetters);
-            } else {
-              await targetChannel.send(`/${'verify'} ${sixLetters}`);
-            }
-          }
-        }
-
-        // Check if the embed title contains "You farmed:"
-        if (embedTitle && embedTitle.includes('You farmed:')) {
-          // Increment the button click count
-          totalButtonClicks++;
-
-          // Move the cursor to the beginning of the line and clear it
-          process.stdout.write('\r\x1b[K');
-          // Display total button clicks in the console UI
-          process.stdout.write(`Total button clicks: ${totalButtonClicks}`);
-        }
-      }
-
-      // Check if the message content contains "You may now continue."
-      if (lastMessage.content.includes('You may now continue.')) {
-        shouldClickButton = true;
-        console.log('Found "You may now continue."');
-      }
-
-      // Perform lastMessage.clickButton(); only if shouldClickButton is true
-      if (shouldClickButton && !pauseButtonClick) {
-        lastMessage.clickButton();
-      }
-    }
-  } catch (error) {
-    console.error('Error:', error);
-  }
+	try {
+		const t = await client.channels.fetch(targetChannelId);
+		if (t.isText()) {
+			const e = await t.messages.fetch({
+					limit: 2
+				}),
+				o = e.last(),
+				n = e.first();
+			if (n.components.length > 0 && n.embeds.length > 0) {
+				const e = n.embeds[0].title;
+				if (e && e.includes("Antibot Verification")) {
+					const e = n.embeds[0].description,
+						o = e.indexOf("playing:") + 8,
+						s = e.substr(o).match(/[A-Za-z0-9]{6}/)?.[0];
+					s && (t.sendSlash ? await t.sendSlash("631216892606152714", "verify", s) : await t.send(`/verify ${s}`)), shouldClickButtonAbove = !0
+				} else o.clickButton(), totalButtonClicks++, process.stdout.write("\r[K"), process.stdout.write(`Total button clicks: ${totalButtonClicks}`)
+			}
+			o.content.includes("You may now continue.") && shouldClickButtonAbove && (n.clickButton(), totalButtonClicks++, shouldClickButtonAbove = !1)
+		}
+	} catch (t) {
+		console.error("Error:", t)
+	}
 }
-
-// Set up keypress to listen for the 'p' key
-keypress(process.stdin);
-
-process.stdin.on('keypress', function (ch, key) {
-  if (key && key.name === 'p') {
-    pauseButtonClick = !pauseButtonClick; // Toggle pauseButtonClick variable
-    // Move the cursor to the beginning of the next line and clear it
-    process.stdout.write('\n\x1b[K');
-    console.log(`Button clicks ${pauseButtonClick ? 'paused' : 'resumed'}.`);
-  }
-});
-
-// Enable listening for keypress events
-process.stdin.setRawMode(true);
-process.stdin.resume();
-
-// Display total button clicks when the script is terminated
-process.on('SIGINT', () => {
-  console.log(`Total button clicks before exiting: ${totalButtonClicks}`);
-  process.exit();
-});
+client.on("ready", (async () => {
+	clickButtonRandomly()
+})), client.login(config.token), keypress(process.stdin), process.stdin.on("keypress", (function(t, e) {
+	e && "p" === e.name && (pauseButtonClick = !pauseButtonClick, process.stdout.write("\n[K"), console.log(`Button clicks ${pauseButtonClick?"paused":"resumed"}.`))
+})), process.stdin.setRawMode(!0), process.stdin.resume(), process.on("SIGINT", (() => {
+	console.log(`Total button clicks before exiting: ${totalButtonClicks}`), process.exit()
+}));
