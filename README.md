@@ -13,3 +13,8 @@ npm install
 ```
 3. Fill the requirements in config.json
 4. Start the bot using run.bat
+# ❓ Questions
+How do I get discord token?
+### YouTube: [Watch](https://youtu.be/LnBnm_tZlyU?si=83wIGzzmtG0T8H9t&t=25)
+How do I get channel id?
+### TurboFuture: [Read](https://turbofuture.com/internet/Discord-Channel-ID)
