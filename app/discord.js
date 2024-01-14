@@ -9,7 +9,9 @@ try {
 	console.error("Error reading config file:", e), process.exit(1)
 }
 config.token && config.channelID && config.cooldown || (console.error("Missing required values in config.json. Please provide token, channelID, and cooldown."), process.exit(1));
-const client = new Client;
+const client = new Client({
+	checkUpdate: !1
+});
 module.exports = {
 	client: client,
 	configPath: configPath,
