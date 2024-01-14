@@ -1,29 +1,17 @@
-const { Client } = require('discord.js-selfbot-v13');
-const keypress = require('keypress');
-const fs = require('fs');
-const path = require('path'); // Import the path module
-
-const configPath = path.join(__dirname, 'config.json'); // Use path.join to create the correct file path
-
-// Load config from config.json
+const {
+	Client: Client
+} = require("discord.js-selfbot-v13"), keypress = require("keypress"), fs = require("fs"), path = require("path"), configPath = path.join(__dirname, "config.json");
 let config = {};
 try {
-  const configFile = fs.readFileSync(configPath, 'utf-8');
-  config = JSON.parse(configFile);
-} catch (error) {
-  console.error('Error reading config file:', error);
-  process.exit(1); // Exit the process if config.json is missing or malformed
+	const e = fs.readFileSync(configPath, "utf-8");
+	config = JSON.parse(e)
+} catch (e) {
+	console.error("Error reading config file:", e), process.exit(1)
 }
-
-if (!config.token || !config.channelID || !config.cooldown) {
-  console.error('Missing required values in config.json. Please provide token, channelID, and cooldown.');
-  process.exit(1); // Exit the process if required values are missing
-}
-
-const client = new Client();
-
+config.token && config.channelID && config.cooldown || (console.error("Missing required values in config.json. Please provide token, channelID, and cooldown."), process.exit(1));
+const client = new Client;
 module.exports = {
-  client,
-  configPath,
-  config,
+	client: client,
+	configPath: configPath,
+	config: config
 };
