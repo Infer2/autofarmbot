@@ -1,0 +1,6 @@
+{
+    "token": "YOUR_TOKEN",
+    "cooldown": 2.5,
+    "targetChannelId": "YOUR_CHANNELID"
+  }
+  
