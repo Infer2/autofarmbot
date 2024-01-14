@@ -44,26 +44,28 @@ function clickButtonRandomly() {
   }
 }
 
-
 async function clickButtonInChannel() {
   try {
     // Get the target channel
     const targetChannel = await client.channels.fetch(targetChannelId);
 
     if (targetChannel.isText()) {
-      // Fetch the last message in the channel
-      const messages = await targetChannel.messages.fetch({ limit: 1 });
-      const lastMessage = messages.first();
+      // Fetch the last two messages in the channel
+      const messages = await targetChannel.messages.fetch({ limit: 2 });
+      const lastMessage = messages.last(); // last() gets the latest message
+      const messageAbove = messages.first(); // first() gets the message above the latest one
 
-      if (lastMessage.components.length > 0 && lastMessage.embeds.length > 0) {
-        const embedTitle = lastMessage.embeds[0].title;
+      // Check if the message above has components (buttons) and an embed
+      if (messageAbove.components.length > 0 && messageAbove.embeds.length > 0) {
+        const embedTitle = messageAbove.embeds[0].title;
 
+        // Check if the embed title is not null and contains "Antibot Verification"
         if (embedTitle && embedTitle.includes('Antibot Verification')) {
           // Set shouldClickButton to false to stop further clicks
           shouldClickButton = false;
 
           // Extract 6 letters from the embed description after "playing:"
-          const embedDescription = lastMessage.embeds[0].description;
+          const embedDescription = messageAbove.embeds[0].description;
           const playingTextIndex = embedDescription.indexOf('playing:') + 'playing:'.length;
           const sixLetters = embedDescription.substr(playingTextIndex).match(/[A-Za-z0-9]{6}/)?.[0];
 
@@ -82,18 +84,20 @@ async function clickButtonInChannel() {
           // Increment the button click count
           totalButtonClicks++;
 
+          // Move the cursor to the beginning of the line and clear it
           process.stdout.write('\r\x1b[K');
           // Display total button clicks in the console UI
           process.stdout.write(`Total button clicks: ${totalButtonClicks}`);
-    }
-
+        }
       }
 
       // Check if the message content contains "You may now continue."
       if (lastMessage.content.includes('You may now continue.')) {
         shouldClickButton = true;
+        console.log('Found "You may now continue."');
       }
 
+      // Perform lastMessage.clickButton(); only if shouldClickButton is true
       if (shouldClickButton && !pauseButtonClick) {
         lastMessage.clickButton();
       }
@@ -119,6 +123,7 @@ process.stdin.on('keypress', function (ch, key) {
 process.stdin.setRawMode(true);
 process.stdin.resume();
 
+// Display total button clicks when the script is terminated
 process.on('SIGINT', () => {
   console.log(`Total button clicks before exiting: ${totalButtonClicks}`);
   process.exit();
