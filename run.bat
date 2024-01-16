@@ -1,4 +1,4 @@
 @echo off
 title Autofarmbot
-node main.js %*
+node index.js %*
 pause
