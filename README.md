@@ -12,9 +12,6 @@ Directly adapted from [autofishbot](https://github.com/thejoabo/autofishbot/)
 ``` 
 npm install 
 ```
-``` 
-npm install replace-in-file
-```
 3. Fill the requirements in config.json
 4. Start the bot using run.bat
 # ❓ Questions
