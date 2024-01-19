@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "discord.js-selfbot-v13": "^2.15.1",
+    "discord.js-selfbot-v13": "2.15.1",
     "keypress": "^0.2.1",
     "replace-in-file": "^7.1.0"
   }
