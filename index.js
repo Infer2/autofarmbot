@@ -1,5 +1,6 @@
 const {
-	Client: t
+	Client: t,
+	RichPresence: n
 } = require("discord.js-selfbot-v13"), fs = require("fs"), config = JSON.parse(fs.readFileSync("config.json", "utf8")), client = new t, channelId = config.channelId;
 let loopCount = 0,
 	buyboostActive = !1;
@@ -47,15 +48,19 @@ function buyboost(t) {
 		y: 1,
 		x: 0
 	}];
-	! function o(i) {
-		if (i >= n.length) {
+	! function o(e) {
+		if (e >= n.length) {
 			buyboostActive = !1;
 			return
 		}
-		t.clickButton({
-			X: n[i].x,
-			Y: n[i].y
-		}), console.log(`Clicked button at X: ${n[i].x}, Y: ${n[i].y}`), setTimeout(() => o(i + 1), 1e3)
+		try {
+			t.clickButton({
+				X: n[e].x,
+				Y: n[e].y
+			}), console.log(`Clicked button at X: ${n[e].x}, Y: ${n[e].y}`), setTimeout(() => o(e + 1), 1e3)
+		} catch (i) {
+			"BUTTON_CANNOT_CLICK" === i.message ? (console.log(`Skipping button at X: ${n[e].x}, Y: ${n[e].y} - cannot click.`), o(e + 1)) : (console.error(`Unexpected error at button ${e}:`, i), buyboostActive = !1)
+		}
 	}(0)
 }
 
@@ -67,17 +72,21 @@ function click(t) {
 }
 client.once("ready", async () => {
 	console.log(`Logged in as ${client.user.tag}`);
-	let t = async () => {
+	let t = new n(client).setPlatform("ios");
+	client.user.setPresence({
+		activities: t
+	});
+	let o = async () => {
 		if (buyboostActive) {
-			setTimeout(t, 2500);
+			setTimeout(o, 2500);
 			return
 		}
-		let n = await client.channels.fetch(channelId),
-			o = await n.messages.fetch({
+		let t = await client.channels.fetch(channelId),
+			n = await t.messages.fetch({
 				limit: 1
 			}),
-			i = o.first();
-		antibot(i) ? bot() : config.buyboostEnabled && loopCount % 375 == 0 ? buyboost(i) : click(i), loopCount++, setTimeout(t, 2500)
+			e = n.first();
+		antibot(e) ? bot() : config.buyboostEnabled && loopCount % 375 == 0 ? buyboost(e) : click(e), loopCount++, setTimeout(o, 2500)
 	};
-	t()
+	o()
 }), client.login(config.token);
