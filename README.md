@@ -19,5 +19,5 @@ npm install
 ## How do I get channel id?
 ### TurboFuture: [Read](https://turbofuture.com/internet/Discord-Channel-ID)
 ---
-# Feel Free to contact my discord if you have any questions. Used discord.js-selfbot-v13 and keypress 
+# Used discord.js-selfbot-v13
 # Discord: [infer_](https://discord.com/users/762574927487303691)
