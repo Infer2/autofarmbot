@@ -1,5 +1,5 @@
 {
-    "token": "token",
-    "cooldown": 2.5,
-    "channelID": "channel_id"
+    "channelId": "channel id here9",
+    "buyboostEnabled": true,
+    "token": "token here"
 }
