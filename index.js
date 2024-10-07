@@ -78,7 +78,7 @@ client.once("ready", async () => {
 	});
 	let o = async () => {
 		if (buyboostActive) {
-			setTimeout(o, 2500);
+			setTimeout(o, config.cooldown);
 			return
 		}
 		let t = await client.channels.fetch(channelId),
@@ -86,7 +86,7 @@ client.once("ready", async () => {
 				limit: 1
 			}),
 			e = n.first();
-		antibot(e) ? bot() : config.buyboostEnabled && loopCount % 375 == 0 ? buyboost(e) : click(e), loopCount++, setTimeout(o, 2500)
+		antibot(e) ? bot() : config.buyboostEnabled && loopCount % 375 == 0 ? buyboost(e) : click(e), loopCount++, setTimeout(o, config.cooldown)
 	};
 	o()
 }), client.login(config.token);
